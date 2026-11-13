@@ -25,7 +25,9 @@ class OnlineEngine:
         try:
             from deep_translator import GoogleTranslator
         except ImportError as exc:
-            raise EngineUnavailableError("Online translation dependency is not installed.") from exc
+            raise EngineUnavailableError(
+                "Online translation dependency is not installed."
+            ) from exc
         return GoogleTranslator
 
     @staticmethod
@@ -58,10 +60,12 @@ class OnlineEngine:
                     results.append(result)
                     last_error = None
                     break
-                except Exception as exc:
+                except Exception as exc:  # noqa: BLE001
                     last_error = exc
                     if attempt < self.retries:
                         sleep(0.2)
             if last_error is not None:
-                raise EngineUnavailableError("Online translation failed. Check your connection or choose Offline.") from last_error
+                raise EngineUnavailableError(
+                    "Online translation failed. Check your connection or choose Offline."
+                ) from last_error
         return " ".join(results)

@@ -12,7 +12,9 @@ _SIGNATURES = {
 }
 
 
-def validate_upload(name: str, data: bytes, kinds: set[str] | None = None, max_mb: int = 5) -> str:
+def validate_upload(
+    name: str, data: bytes, kinds: set[str] | None = None, max_mb: int = 5
+) -> str:
     extension = PurePath(name).suffix.lower()
     allowed = kinds or set(_SIGNATURES)
     if extension not in allowed or extension not in _SIGNATURES:
@@ -20,5 +22,7 @@ def validate_upload(name: str, data: bytes, kinds: set[str] | None = None, max_m
     if len(data) > max_mb * 1024 * 1024:
         raise FileTooLargeError(f"File is larger than the {max_mb} MB limit.")
     if not _SIGNATURES[extension](data):
-        raise UnsupportedFileError("The file contents do not match the selected file type.")
+        raise UnsupportedFileError(
+            "The file contents do not match the selected file type."
+        )
     return extension

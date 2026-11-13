@@ -6,7 +6,6 @@ from pathlib import Path
 from src.engines.offline import OfflineEngine
 from src.engines.online import OnlineEngine
 from src.models import Lang
-from src.utils.lang import detect
 
 
 def evaluate_pairs(rows: list[dict[str, str]], engine) -> list[dict[str, object]]:
@@ -34,7 +33,9 @@ def evaluate_pairs(rows: list[dict[str, str]], engine) -> list[dict[str, object]
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Evaluate a translation engine against a fixed CSV pair set.")
+    parser = argparse.ArgumentParser(
+        description="Evaluate a translation engine against a fixed CSV pair set."
+    )
     parser.add_argument("pairs", type=Path)
     parser.add_argument("--engine", choices=("online", "offline"), default="online")
     args = parser.parse_args()

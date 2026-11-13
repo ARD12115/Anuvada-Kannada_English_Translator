@@ -21,10 +21,14 @@ def read_notice(name: str, data: bytes, max_mb: int = 5, max_pages: int = 100) -
                 text = "\n".join(page.extract_text() or "" for page in pdf.pages)
         except UnsupportedFileError:
             raise
-        except Exception as exc:
+        except (OSError, ValueError, pdfplumber.pdf.PDFSyntaxError) as exc:
             raise UnsupportedFileError("This PDF could not be read.") from exc
     if not text.strip():
-        raise EmptyInputError("No selectable text was found. Scanned PDFs need OCR first.")
+        raise EmptyInputError(
+            "No selectable text was found. Scanned PDFs need OCR first."
+        )
     if len(text) > 5000:
-        raise UnsupportedFileError("Notice exceeds the 5,000 character translation limit.")
+        raise UnsupportedFileError(
+            "Notice exceeds the 5,000 character translation limit."
+        )
     return text

@@ -33,7 +33,11 @@ def image_to_text(data: bytes, languages: str = "kan+eng") -> str:
         return pytesseract.image_to_string(image, lang=languages).strip()
     except OcrUnavailableError:
         raise
-    except Exception as exc:
+    except (ImportError, OSError) as exc:
+        raise OcrUnavailableError(
+            "OCR is unavailable. Install Tesseract with Kannada and English language packs."
+        ) from exc
+    except (pytesseract.TesseractNotFoundError, pytesseract.TesseractError) as exc:
         raise OcrUnavailableError(
             "OCR is unavailable. Install Tesseract with Kannada and English language packs."
         ) from exc

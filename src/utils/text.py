@@ -13,7 +13,9 @@ def split_sentences(text: str) -> list[str]:
         line = line.strip()
         if not line:
             continue
-        sentences.extend(part.strip() for part in _SENTENCE_BOUNDARY.split(line) if part.strip())
+        sentences.extend(
+            part.strip() for part in _SENTENCE_BOUNDARY.split(line) if part.strip()
+        )
     return sentences
 
 
@@ -26,6 +28,10 @@ def translate_preserving_lines(text: str, translate: Callable[[str], str]) -> st
         if not line.strip():
             translated_lines.append("")
             continue
-        parts = [part.strip() for part in _SENTENCE_BOUNDARY.split(line.strip()) if part.strip()]
+        parts = [
+            part.strip()
+            for part in _SENTENCE_BOUNDARY.split(line.strip())
+            if part.strip()
+        ]
         translated_lines.append(" ".join(translate(part) for part in parts))
     return "\n".join(translated_lines)

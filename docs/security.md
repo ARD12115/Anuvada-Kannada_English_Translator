@@ -4,7 +4,7 @@ Translated text can include personal details (names, phone numbers, notices with
 
 ## 1. Principles
 1. Be honest about where text goes: the online engine and speech/TTS send data to Google services.
-2. Offer a fully offline path (NLLB + Tesseract) for sensitive text.
+2. Offer a fully offline path (NLLB + Tesseract) for sensitive text; never silently fall back from Offline mode to a cloud engine.
 3. Store nothing by default; history is session-only.
 
 ## 2. Threats and controls

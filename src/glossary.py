@@ -3,14 +3,23 @@ import re
 from pathlib import Path
 
 _GLOSSARY_PATH = Path(__file__).resolve().parents[1] / "data" / "glossary.csv"
-_DEFAULT_TERMS = ("HoD", "CIE", "semester", "fee receipt", "internal assessment", "principal")
+_DEFAULT_TERMS = (
+    "HoD",
+    "CIE",
+    "semester",
+    "fee receipt",
+    "internal assessment",
+    "principal",
+)
 
 
 def _terms() -> tuple[str, ...]:
     try:
         with _GLOSSARY_PATH.open(encoding="utf-8", newline="") as glossary_file:
             rows = csv.DictReader(glossary_file)
-            terms = tuple(row["term"].strip() for row in rows if row.get("term", "").strip())
+            terms = tuple(
+                row["term"].strip() for row in rows if row.get("term", "").strip()
+            )
             return terms or _DEFAULT_TERMS
     except FileNotFoundError:
         return _DEFAULT_TERMS

@@ -29,13 +29,19 @@ def translate(
     if preferred not in engine_map:
         raise EngineUnavailableError(f"Unknown translation engine: {preferred}")
     other = "offline" if preferred == "online" else "online"
-    order = [preferred] + ([other] if other in engine_map else [])
+    # Never send input to a cloud engine as an implicit fallback from Offline mode.
+    order = [preferred] + (
+        [other] if preferred == "online" and other in engine_map else []
+    )
     failures = []
     for index, name in enumerate(order):
         try:
-            def translate_sentence(sentence: str) -> str:
+
+            def translate_sentence(sentence: str, engine_name: str = name) -> str:
                 protected, replacements = apply_pre(sentence)
-                translated = engine_map[name].translate(protected, source, target)
+                translated = engine_map[engine_name].translate(
+                    protected, source, target
+                )
                 return apply_post(translated, replacements)
 
             result = translate_preserving_lines(text, translate_sentence)

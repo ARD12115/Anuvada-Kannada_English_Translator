@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.claude/settings.local.json
+data/samples/*
+!data/samples/.gitkeep
+.cache/
+models/
+*.log
+history.csv

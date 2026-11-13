@@ -1,0 +1,14 @@
+streamlit
+deep-translator
+transformers
+torch
+sentencepiece
+pytesseract
+Pillow
+SpeechRecognition
+gTTS
+pdfplumber
+sacrebleu
+pandas
+pytest
+ruff

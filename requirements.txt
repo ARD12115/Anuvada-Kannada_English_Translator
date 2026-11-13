@@ -1,12 +1,12 @@
 streamlit
-deep-translator
-transformers
+deep-translator==1.11.4
+transformers<5
 torch
 sentencepiece
 pytesseract
 Pillow
 SpeechRecognition
-gTTS
+gTTS==2.5.4
 pdfplumber
 sacrebleu
 pandas

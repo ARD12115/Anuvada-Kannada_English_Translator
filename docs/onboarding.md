@@ -2,9 +2,10 @@
 
 ## Setup (needs internet once, ~15 minutes plus the downloads)
 ```bash
-git clone <repo-url> && cd anuvada
+git clone https://github.com/ARD12115/Anuvada-Kannada_English_Translator.git anuvada
+cd anuvada
 bash scripts/setup.sh        # venv, deps, caches NLLB (~2.4 GB)
-streamlit run src/ui/app.py
+bash scripts/run.sh
 ```
 
 ## Tesseract with Kannada (for the Signboard tab)
@@ -16,7 +17,7 @@ Check: `tesseract --list-langs` should include `kan`.
 ## Using Claude Code (optional)
 ```bash
 npm i -g @anthropic-ai/claude-code
-cd anuvada && claude
+claude
 ```
 Commands: `/review`, `/test-all`, `/bootstrap engines/offline`, `/eval`, `/demo-check`.
 Subagents: `code-reviewer`, `test-writer`, `security-auditor`. Read `CLAUDE.md` first.

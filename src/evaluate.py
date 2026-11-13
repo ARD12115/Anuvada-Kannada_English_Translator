@@ -14,10 +14,19 @@ def evaluate_pairs(rows: list[dict[str, str]], engine) -> list[dict[str, object]
     grouped: dict[str, list[tuple[str, str]]] = defaultdict(list)
     for row in rows:
         source = row["source"]
-        src: Lang = "kn" if row["direction"].upper() in {"KN-EN", "KN->EN"} else "en"
-        tgt: Lang = "en" if src == "kn" else "kn"
+        direction = row["direction"].upper().replace(" ", "")
+        if direction in {"KN->EN", "KN-EN"}:
+            src: Lang = "kn"
+            tgt: Lang = "en"
+        elif direction in {"EN->KN", "EN-KN"}:
+            src = "en"
+            tgt = "kn"
+        else:
+            raise ValueError(f"Unsupported translation direction: {row['direction']}")
+        if not source.strip() or not row["reference"].strip():
+            raise ValueError("Evaluation source and reference text must not be empty.")
         hypothesis = engine.translate(source, src, tgt)
-        grouped[row["direction"]].append((hypothesis, row["reference"]))
+        grouped[direction].append((hypothesis, row["reference"]))
     results = []
     for direction, pairs in sorted(grouped.items()):
         hypotheses, references = zip(*pairs)

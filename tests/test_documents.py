@@ -28,3 +28,8 @@ def test_rejects_empty_or_scanned_pdf(monkeypatch):
     monkeypatch.setattr("src.input.documents.pdfplumber.open", lambda stream: Pdf())
     with pytest.raises(EmptyInputError, match="Scanned PDFs"):
         read_notice("scan.pdf", b"%PDF-1.7")
+
+
+def test_invalid_pdf_is_returned_as_a_typed_error():
+    with pytest.raises(UnsupportedFileError, match="PDF could not be read"):
+        read_notice("broken.pdf", b"%PDF-not-a-document")

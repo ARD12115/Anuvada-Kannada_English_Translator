@@ -1,5 +1,6 @@
 from typing import ClassVar
 
+import deep_translator.google as google_module
 import pytest
 
 from src.engines.online import OnlineEngine
@@ -38,3 +39,27 @@ def test_online_engine_retries_then_raises_a_typed_error():
 
     with pytest.raises(EngineUnavailableError, match="Online translation failed"):
         OnlineEngine(BrokenTranslator, retries=1).translate("Hello", "en", "kn")
+
+
+def test_online_engine_applies_finite_timeouts_at_requests_boundary(monkeypatch):
+    class FakeRequests:
+        def __init__(self):
+            self.kwargs = []
+
+        def get(self, url, **kwargs):
+            self.kwargs.append(kwargs)
+            return object()
+
+    requests = FakeRequests()
+    monkeypatch.setattr(google_module, "requests", requests)
+
+    class Translator:
+        def __init__(self, source, target):
+            pass
+
+        def translate(self, text):
+            google_module.requests.get("https://example.invalid", timeout=None)
+            return text
+
+    assert OnlineEngine(Translator, retries=0).translate("Hello", "en", "kn") == "Hello"
+    assert requests.kwargs == [{"timeout": (3.05, 10.0)}]

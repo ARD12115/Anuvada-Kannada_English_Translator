@@ -17,14 +17,18 @@
 ## 2. Translation evaluation
 1. Build `data/eval/pairs.csv` (id, direction, source, reference): ~15 KN->EN and ~15 EN->KN sentences covering notices, signs, campus terms, everyday phrases.
 2. References written by Kannada-fluent teammates (note who).
-3. Run `python -m src.evaluate data/eval/pairs.csv` for each engine; record chrF and BLEU.
+3. Run each engine explicitly; record chrF and BLEU:
+   - Online: `python -m src.evaluate data/eval/pairs.csv --engine online`
+   - Offline: `python -m src.evaluate data/eval/pairs.csv --engine offline`
 4. List worst 5 sentences; add glossary entries or settings where it helps.
 5. State the sample size when presenting results.
 
 | Engine | Direction | chrF | BLEU | n |
 |---|---|---|---|---|
 | Online | KN->EN | | | 15 |
+| Online | EN->KN | | | 15 |
 | Offline | KN->EN | | | 15 |
+| Offline | EN->KN | | | 15 |
 
 ## 3. OCR evaluation
 10-15 public signboard photos (clear, angled, low light). Hand-type ground truth, compute character accuracy, record which conditions fail.

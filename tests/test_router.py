@@ -1,7 +1,7 @@
 import pytest
 
 from src.engines.router import translate
-from src.utils.errors import EmptyInputError, EngineUnavailableError
+from src.utils.errors import EmptyInputError, EngineUnavailableError, FileTooLargeError
 
 
 class Engine:
@@ -59,3 +59,10 @@ def test_router_rejects_empty_input_and_same_direction():
         translate(" ")
     with pytest.raises(EmptyInputError):
         translate("Hello", source_lang="en", target_lang="en")
+
+
+def test_router_rejects_over_limit_input_before_engine_call():
+    online = Engine("online")
+    with pytest.raises(FileTooLargeError):
+        translate("x" * 5001, engines={"online": online})
+    assert online.calls == []

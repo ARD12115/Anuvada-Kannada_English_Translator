@@ -22,7 +22,7 @@ text / mic audio / image / .txt / .pdf
    -> utils.lang.detect (Unicode range)
    -> utils.text.split_sentences
    -> glossary.pre (protect campus terms)
-   -> engines.<selected>.translate (fallback online -> offline)
+   -> engines.<selected>.translate (Online may fall back to Offline; Offline never falls back online)
    -> glossary.post
    -> ui renders result (+ optional TTS, history, export)
 ```
@@ -49,23 +49,23 @@ NLLB codes: `kn -> kan_Knda`, `en -> eng_Latn`.
 ## 4. Modules
 | Module | Function | Notes |
 |---|---|---|
-| `utils/lang.py` | `detect(text) -> Lang` | Kannada if >30% of letters are in U+0C80-U+0CFF, else English |
+| `utils/lang.py` | `detect(text) -> Lang` | Kannada when Kannada letters outnumber Latin letters; ties/default to English |
 | `utils/text.py` | `split_sentences(text) -> list[str]`, `join_preserving_lines(...)` | Splits on `. ! ? ।` and newlines; keeps paragraph breaks |
 | `engines/online.py` | `OnlineEngine` | Chunks text under the provider's length limit; retries once |
 | `engines/offline.py` | `OfflineEngine` | Lazy-loads model, batch of sentences, `max_length` capped |
-| `engines/router.py` | `translate(text, src, tgt, preferred) -> TranslationResult` | Falls back to the other engine on error/network loss |
+| `engines/router.py` | `translate(text, src, tgt, preferred) -> TranslationResult` | Online failures may fall back to Offline; Offline failures never send text online |
 | `input/validators.py` | `validate_upload(name, data, kinds)` | Extension, magic bytes, size |
 | `input/ocr.py` | `image_to_text(data: bytes) -> str` | Grayscale + upscale + threshold; `kan+eng`; raises `OcrUnavailableError` if Tesseract/pack missing |
 | `input/speech.py` | `speech_to_text(audio: bytes, lang) -> str` | Online only; returns text the user can edit |
 | `input/tts.py` | `text_to_speech(text, lang) -> bytes` | Optional |
 | `input/documents.py` | `read_notice(name, data) -> str` | .txt (utf-8) and .pdf |
-| `glossary.py` | `apply_pre(text)`, `apply_post(text, lang)` | CSV of campus terms (`data/glossary.csv`) |
+| `glossary.py` | `apply_pre(text, source, target)`, `apply_post(parts)` | Protected glossary spans are inserted directly in the target language and are not sent to an engine |
 | `export.py` | `bilingual_text(original, translated) -> str` | Side-by-side or alternating blocks |
 | `evaluate.py` | `python -m src.evaluate pairs.csv` | chrF/BLEU per engine/direction |
 | `ui/app.py` | Streamlit tabs | No logic |
 
 ## 5. Language detection details
-Count letters in the Kannada block vs Latin letters. Mixed text: choose the majority script, allow manual override in the UI. Kanglish (Kannada in Latin script) is detected as English in Stage 1 (known limitation).
+Count Kannada-block letters versus Latin letters. Mixed text uses the majority of those scripts; Kannada is selected only when its count is greater, while ties and text with no recognized letters default to English. For example, four Kannada letters and six Latin letters detect as English. Kanglish (Kannada in Latin script) is detected as English in Stage 1 (known limitation).
 
 ## 6. Error handling
 `EmptyInputError`, `UnsupportedFileError`, `FileTooLargeError`, `OcrUnavailableError`, `EngineUnavailableError`, `SpeechError`. UI maps them to friendly messages. Unexpected errors show a generic message; logs hold only event types and counts.

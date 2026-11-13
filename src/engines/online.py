@@ -1,7 +1,37 @@
+from threading import RLock
 from time import sleep
 
 from src.models import Lang
 from src.utils.errors import EngineUnavailableError
+
+REQUEST_TIMEOUT = (3.05, 10.0)
+_REQUEST_PATCH_LOCK = RLock()
+
+
+class _RequestsWithTimeout:
+    def __init__(self, requests_module, timeout: tuple[float, float]):
+        self._requests = requests_module
+        self._timeout = timeout
+
+    def get(self, *args, **kwargs):
+        if kwargs.get("timeout") is None:
+            kwargs["timeout"] = self._timeout
+        return self._requests.get(*args, **kwargs)
+
+
+def _translate_with_timeout(translator, text: str) -> str:
+    import deep_translator.google as google_module
+
+    # deep-translator 1.11.4 calls requests.get without a timeout parameter.
+    with _REQUEST_PATCH_LOCK:
+        original_requests = google_module.requests
+        google_module.requests = _RequestsWithTimeout(
+            original_requests, REQUEST_TIMEOUT
+        )
+        try:
+            return translator.translate(text)
+        finally:
+            google_module.requests = original_requests
 
 
 class OnlineEngine:
@@ -54,7 +84,7 @@ class OnlineEngine:
             for attempt in range(self.retries + 1):
                 try:
                     translator = factory(source=src, target=tgt)
-                    result = translator.translate(chunk)
+                    result = _translate_with_timeout(translator, chunk)
                     if not result:
                         raise ValueError("Translation provider returned no text.")
                     results.append(result)

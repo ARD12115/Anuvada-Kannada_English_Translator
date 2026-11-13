@@ -41,3 +41,12 @@ def test_ocr_reports_missing_language_pack(monkeypatch):
 def test_ocr_rejects_invalid_image():
     with pytest.raises(UnsupportedFileError):
         image_to_text(b"not an image")
+
+
+def test_grayscale_decode_errors_are_typed_as_unsupported_file(monkeypatch):
+    def fail_grayscale(image):
+        raise OSError("decode failed")
+
+    monkeypatch.setattr("src.input.ocr.ImageOps.grayscale", fail_grayscale)
+    with pytest.raises(UnsupportedFileError):
+        image_to_text(_png())

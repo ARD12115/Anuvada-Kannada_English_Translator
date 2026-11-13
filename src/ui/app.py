@@ -38,13 +38,15 @@ def _translate(
     preferred: str,
     source: Lang | None = None,
     target: Lang | None = None,
+    result_key: str = "text_result",
 ) -> None:
     if len(text) > MAX_TEXT_LENGTH:
         raise FileTooLargeError(
             f"Text exceeds the {MAX_TEXT_LENGTH:,} character limit."
         )
     engines = {"online": OnlineEngine(), "offline": get_offline_engine()}
-    result = translate(text, preferred, source, target, engines)
+    with st.spinner(f"Translating with the {preferred.title()} engine…"):
+        result = translate(text, preferred, source, target, engines)
     record = {
         "source": text,
         "translated": result.text,
@@ -56,10 +58,10 @@ def _translate(
     st.session_state.history.insert(0, record)
     if len(st.session_state.history) > 100:
         del st.session_state.history[100:]
-    st.session_state.last_result = record
+    st.session_state[result_key] = record
 
 
-def _engine_result(key: str = "last_result") -> None:
+def _engine_result(key: str) -> None:
     record = st.session_state.get(key)
     if not record:
         return
@@ -136,12 +138,12 @@ def main() -> None:
             if st.button("Translate", type="primary", key="text_translate"):
                 try:
                     source, target = _direction(direction, text)
-                    _translate(text, engine, source, target)
+                    _translate(text, engine, source, target, "text_result")
                 except AnuvadaError as exc:
                     _show_error(exc)
         with right:
             st.subheader("Translation")
-            _engine_result()
+            _engine_result("text_result")
         st.caption(
             "Machine translation may be inaccurate. Check important information against the original."
         )
@@ -173,10 +175,10 @@ def main() -> None:
         )
         if st.button("Translate recognized text", key="voice_translate"):
             try:
-                _translate(voice_text, engine)
-                _engine_result()
+                _translate(voice_text, engine, result_key="voice_result")
             except AnuvadaError as exc:
                 _show_error(exc)
+        _engine_result("voice_result")
 
     with signboard_tab:
         st.caption(
@@ -207,10 +209,10 @@ def main() -> None:
         )
         if st.button("Translate signboard", key="signboard_translate"):
             try:
-                _translate(ocr_text, engine)
-                _engine_result()
+                _translate(ocr_text, engine, result_key="signboard_result")
             except AnuvadaError as exc:
                 _show_error(exc)
+        _engine_result("signboard_result")
 
     with notice_tab:
         notice_file = st.file_uploader(
@@ -230,11 +232,11 @@ def main() -> None:
         )
         if st.button("Translate notice", type="primary", key="notice_translate"):
             try:
-                _translate(notice, engine)
-                _engine_result()
+                _translate(notice, engine, result_key="notice_result")
             except AnuvadaError as exc:
                 _show_error(exc)
-        record = st.session_state.get("last_result")
+        _engine_result("notice_result")
+        record = st.session_state.get("notice_result")
         if record and record["source"] == notice:
             original_col, translation_col = st.columns(2)
             with original_col:
@@ -268,7 +270,7 @@ def main() -> None:
                     }
                     for entry in history
                 ],
-                use_container_width=True,
+                width="stretch",
             )
             output = StringIO()
             writer = csv.DictWriter(output, fieldnames=history[0].keys())

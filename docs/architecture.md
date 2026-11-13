@@ -35,7 +35,7 @@ anuvada/
 ## Key decisions
 | Decision | Why |
 |---|---|
-| Engine interface + router | Swap Google/NLLB/IndicTrans2 without touching UI; automatic fallback keeps the demo alive |
+| Engine interface + router | Swap Google/NLLB/IndicTrans2 without touching UI; Online may fall back to Offline, never vice versa |
 | Online default, offline bonus | Instant start; offline adds the privacy and no-internet story |
 | Unicode-range language detection | Zero dependencies, exact for Kannada vs Latin script |
 | Editable OCR/voice text | Recognition errors don't become translation errors silently |

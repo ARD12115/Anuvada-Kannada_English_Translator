@@ -12,14 +12,18 @@ def image_to_text(data: bytes, languages: str = "kan+eng") -> str:
         image = Image.open(BytesIO(data))
         image.verify()
         image = Image.open(BytesIO(data))
+        if image.format not in {"JPEG", "PNG"}:
+            raise UnsupportedFileError("Only JPG and PNG images are supported.")
+        if image.width * image.height > 40_000_000:
+            raise UnsupportedFileError(
+                "Image dimensions are too large to process safely."
+            )
+        image = ImageOps.grayscale(image)
+        image.thumbnail((MAX_IMAGE_SIDE, MAX_IMAGE_SIDE))
+    except UnsupportedFileError:
+        raise
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
         raise UnsupportedFileError("Choose a valid JPG or PNG image.") from exc
-    if image.format not in {"JPEG", "PNG"}:
-        raise UnsupportedFileError("Only JPG and PNG images are supported.")
-    if image.width * image.height > 40_000_000:
-        raise UnsupportedFileError("Image dimensions are too large to process safely.")
-    image = ImageOps.grayscale(image)
-    image.thumbnail((MAX_IMAGE_SIDE, MAX_IMAGE_SIDE))
     try:
         import pytesseract
 

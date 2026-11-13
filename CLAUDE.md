@@ -12,7 +12,7 @@ Python 3.11 · Streamlit · online engine (Google Translate via deep-translator)
 
 ## Commands
 - Setup: `bash scripts/setup.sh`
-- Run: `streamlit run src/ui/app.py`
+- Run: `bash scripts/run.sh`
 - Tests: `pytest -q`
 - Eval (translation quality): `python -m src.evaluate data/eval/pairs.csv`
 - Lint: `ruff check . --fix && ruff format .`
@@ -20,7 +20,7 @@ Python 3.11 · Streamlit · online engine (Google Translate via deep-translator)
 ## Conventions
 - Layers: `input` (text/voice/ocr/pdf -> text) -> `engines` (translate) -> `ui`. UI has no logic.
 - All engines implement `TranslationEngine` (`src/engines/base.py`). The UI picks one by name; failures fall back online -> offline.
-- Detect language by script: Kannada characters in U+0C80-U+0CFF; mixed text uses the majority script with a 30% Kannada threshold.
+- Detect language by script: Kannada characters in U+0C80-U+0CFF; mixed text uses the majority of Kannada and Latin letters, with ties defaulting to English.
 - Typed errors from `src/utils/errors.py`; UI shows friendly messages. Never fall back from Offline mode to a cloud engine implicitly.
 - Kannada text must render with a Kannada-capable font (Noto Sans Kannada) in any export.
 

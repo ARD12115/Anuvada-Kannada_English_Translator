@@ -19,7 +19,6 @@ def detect(text: str) -> Lang:
         elif "LATIN" in unicodedata.name(char, ""):
             latin += 1
 
-    total = kannada + latin
-    if total and kannada / total > 0.3 and kannada > latin:
+    if kannada > latin:
         return "kn"
     return "en"

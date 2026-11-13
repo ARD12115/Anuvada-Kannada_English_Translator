@@ -14,4 +14,4 @@ AutoModelForSeq2SeqLM.from_pretrained(name)
 print("Offline model cached.")
 PY
 command -v tesseract >/dev/null || echo "WARNING: Tesseract not found. Install it plus the Kannada pack (see docs/onboarding.md)."
-echo "Setup done. Run: streamlit run src/ui/app.py"
+echo "Setup done. Run: bash scripts/run.sh"

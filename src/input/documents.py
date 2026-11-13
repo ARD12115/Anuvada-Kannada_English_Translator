@@ -1,6 +1,8 @@
 from io import BytesIO
 
 import pdfplumber
+from pdfminer.pdfparser import PDFSyntaxError
+from pdfplumber.utils.exceptions import PdfminerException
 
 from src.input.validators import validate_upload
 from src.utils.errors import EmptyInputError, UnsupportedFileError
@@ -21,7 +23,7 @@ def read_notice(name: str, data: bytes, max_mb: int = 5, max_pages: int = 100) -
                 text = "\n".join(page.extract_text() or "" for page in pdf.pages)
         except UnsupportedFileError:
             raise
-        except (OSError, ValueError, pdfplumber.pdf.PDFSyntaxError) as exc:
+        except (OSError, ValueError, PDFSyntaxError, PdfminerException) as exc:
             raise UnsupportedFileError("This PDF could not be read.") from exc
     if not text.strip():
         raise EmptyInputError(

@@ -3,6 +3,8 @@ from io import BytesIO
 from src.models import Lang
 from src.utils.errors import SpeechError
 
+REQUEST_TIMEOUT = (3.05, 10.0)
+
 
 def text_to_speech(text: str, lang: Lang) -> bytes:
     if not text.strip():
@@ -15,7 +17,11 @@ def text_to_speech(text: str, lang: Lang) -> bytes:
         raise SpeechError("Text-to-speech dependencies are not installed.") from exc
     try:
         output = BytesIO()
-        gTTS(text=text, lang="kn" if lang == "kn" else "en").write_to_fp(output)
+        gTTS(
+            text=text,
+            lang="kn" if lang == "kn" else "en",
+            timeout=REQUEST_TIMEOUT,
+        ).write_to_fp(output)
         return output.getvalue()
     except (gTTSError, RequestException, OSError, ValueError) as exc:
         raise SpeechError(

@@ -9,6 +9,7 @@ def test_detect_kannada_and_english():
 def test_mixed_text_uses_majority_script():
     assert detect("ನಮಸ್ಕಾರ ಎಲ್ಲರೂ everyone") == "kn"
     assert detect("Hello ಎಲ್ಲರೂ, welcome to CIE") == "en"
+    assert detect("ಅಆಇಈ ABCDEF") == "en"
 
 
 def test_digits_punctuation_empty_and_kanglish_default_to_english():

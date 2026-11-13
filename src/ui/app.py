@@ -1,14 +1,12 @@
-import csv
 import logging
 import os
-from io import StringIO
 
 import streamlit as st
 
 from src.engines.offline import OfflineEngine
 from src.engines.online import OnlineEngine
 from src.engines.router import translate
-from src.export import bilingual_text
+from src.export import bilingual_text, history_csv
 from src.input.documents import read_notice
 from src.input.ocr import image_to_text
 from src.input.speech import speech_to_text
@@ -272,13 +270,9 @@ def main() -> None:
                 ],
                 width="stretch",
             )
-            output = StringIO()
-            writer = csv.DictWriter(output, fieldnames=history[0].keys())
-            writer.writeheader()
-            writer.writerows(history)
             st.download_button(
                 "Download history CSV",
-                output.getvalue(),
+                history_csv(history),
                 "anuvada-history.csv",
                 "text/csv",
             )
